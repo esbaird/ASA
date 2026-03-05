@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Architecture Website Feature Comparison — Andrew Sidford Architects</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background: #f5f4f1;
+    color: #1a1a1a;
+    min-height: 100vh;
+  }
+
+  header {
+    background: #1a1a1a;
+    color: #f5f4f1;
+    padding: 36px 48px 28px;
+    border-bottom: 3px solid #c8a96e;
+  }
+
+  header h1 {
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #c8a96e;
+    margin-bottom: 6px;
+  }
+
+  header h2 {
+    font-size: 22px;
+    font-weight: 300;
+    letter-spacing: 0.03em;
+  }
+
+  .legend {
+    display: flex;
+    gap: 28px;
+    padding: 16px 48px;
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .legend-label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #888;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    color: #444;
+  }
+
+  .filters {
+    padding: 14px 48px;
+    background: #faf9f7;
+    border-bottom: 1px solid #e8e4de;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .filter-label {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #888;
+  }
+
+  .filter-btn {
+    padding: 6px 16px;
+    border: 1.5px solid #ccc;
+    border-radius: 20px;
+    background: #fff;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: #555;
+    transition: all 0.2s;
+  }
+
+  .filter-btn:hover { border-color: #1a1a1a; color: #1a1a1a; }
+  .filter-btn.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+
+  .score-bar-container {
+    padding: 24px 48px 0;
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .score-card {
+    background: #fff;
+    border: 1px solid #e8e4de;
+    padding: 16px 22px;
+    border-radius: 4px;
+    flex: 1;
+    min-width: 150px;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+  }
+
+  .score-card.highlight {
+    border-color: #c8a96e;
+    background: #fffdf7;
+  }
+
+  .score-card .firm {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #888;
+    margin-bottom: 5px;
+  }
+
+  .score-card.highlight .firm { color: #c8a96e; }
+
+  .score-card .score {
+    font-size: 26px;
+    font-weight: 300;
+    color: #1a1a1a;
+  }
+
+  .score-card .score span { font-size: 13px; color: #aaa; margin-left: 2px; }
+
+  .score-card .bar-track {
+    height: 4px;
+    background: #f0ede8;
+    border-radius: 2px;
+    margin-top: 9px;
+  }
+
+  .score-card .bar-fill {
+    height: 4px;
+    border-radius: 2px;
+    transition: width 1.1s ease;
+  }
+
+  .note {
+    padding: 12px 48px 0;
+    font-size: 11px;
+    color: #aaa;
+    font-style: italic;
+  }
+
+  .table-wrapper {
+    padding: 28px 48px 60px;
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+  }
+
+  th {
+    background: #1a1a1a;
+    color: #f5f4f1;
+    font-weight: 400;
+    font-size: 10px;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    padding: 14px 12px;
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  th:first-child {
+    text-align: left;
+    min-width: 230px;
+    position: sticky;
+    left: 0;
+    z-index: 5;
+  }
+
+  th.sidford-col {
+    background: #c8a96e;
+    color: #1a1a1a;
+  }
+
+  td {
+    padding: 11px 12px;
+    font-size: 13px;
+    text-align: center;
+    border-bottom: 1px solid #f0ede8;
+    vertical-align: middle;
+  }
+
+  td:first-child {
+    text-align: left;
+    font-weight: 500;
+    font-size: 12px;
+    color: #1a1a1a;
+    position: sticky;
+    left: 0;
+    background: inherit;
+    border-right: 2px solid #e8e4de;
+    padding-right: 20px;
+  }
+
+  tr:nth-child(even) td { background: #faf9f7; }
+  tr:nth-child(odd)  td { background: #fff; }
+  tr:nth-child(even) td:first-child { background: #faf9f7; }
+  tr:nth-child(odd)  td:first-child { background: #fff; }
+  tr:hover td { background: #f0ede8 !important; }
+
+  .category-header td {
+    background: #e8e4de !important;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #555;
+    padding: 10px 14px;
+  }
+
+  .sidford-cell {
+    background: rgba(200,169,110,0.08) !important;
+  }
+
+  tr:hover .sidford-cell {
+    background: rgba(200,169,110,0.2) !important;
+  }
+
+  .updated-cell {
+    position: relative;
+  }
+
+  .updated-cell::after {
+    content: "updated";
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    font-size: 7px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #c8a96e;
+    font-weight: 600;
+  }
+
+  @media (max-width: 768px) {
+    header, .legend, .filters, .table-wrapper, .score-bar-container, .note {
+      padding-left: 16px; padding-right: 16px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Website Improvement Proposal — Andrew Sidford Architects</h1>
+  <h2>Competitive Feature Matrix · 14 Firms Benchmarked</h2>
+</header>
+
+<div class="legend">
+  <span class="legend-label">Key:</span>
+  <div class="legend-item">✅ &nbsp;Feature Present</div>
+  <div class="legend-item">⚪ &nbsp;Partial / Basic</div>
+  <div class="legend-item">❌ &nbsp;Not Present</div>
+</div>
+
+<div class="filters">
+  <span class="filter-label">Filter:</span>
+  <button class="filter-btn active" onclick="filterRows('all',this)">All Features</button>
+  <button class="filter-btn" onclick="filterRows('brand',this)">Brand &amp; Design</button>
+  <button class="filter-btn" onclick="filterRows('portfolio',this)">Portfolio</button>
+  <button class="filter-btn" onclick="filterRows('leads',this)">Lead Generation</button>
+  <button class="filter-btn" onclick="filterRows('content',this)">Content &amp; SEO</button>
+  <button class="filter-btn" onclick="filterRows('gaps',this)">ASA Gaps Only</button>
+</div>
+
+<div class="score-bar-container" id="scoreCards"></div>
+<p class="note">* Score = features present out of 25 total. Partial (⚪) counts as 0.5. ASA score updated to reflect timed homepage pop-up as partial lead magnet.</p>
+
+<div class="table-wrapper">
+  <table id="mainTable">
+    <thead>
+      <tr>
+        <th>Feature</th>
+        <th class="sidford-col">ASA<br><small style="font-weight:300;font-size:9px">Sidford</small></th>
+        <th>Snøhetta</th>
+        <th>BIG</th>
+        <th>Zaha<br>Hadid</th>
+        <th>Studio<br>Gang</th>
+        <th>Foster +<br>Partners</th>
+        <th>Heather-<br>wick</th>
+        <th>Olson<br>Kundig</th>
+        <th>Selldorf</th>
+        <th>Anders-<br>son/Wise</th>
+        <th>Ayers<br>Saint<br>Gross</th>
+        <th>Mohagen<br>Hansen</th>
+        <th>Minale<br>+Mann</th>
+        <th>Vita<br>Arch.</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+</div>
+
+<script>
+const firms = [
+  { key:'asa',  label:'ASA',           sidford:true  },
+  { key:'sno',  label:'Snøhetta',      sidford:false },
+  { key:'big',  label:'BIG',           sidford:false },
+  { key:'zha',  label:'Zaha Hadid',    sidford:false },
+  { key:'sg',   label:'Studio Gang',   sidford:false },
+  { key:'fp',   label:'Foster+',       sidford:false },
+  { key:'hw',   label:'Heatherwick',   sidford:false },
+  { key:'ok',   label:'Olson Kundig',  sidford:false },
+  { key:'sel',  label:'Selldorf',      sidford:false },
+  { key:'aw',   label:'Anders/Wise',   sidford:false },
+  { key:'asg',  label:'Ayers SG',      sidford:false },
+  { key:'mh',   label:'Mohagen',       sidford:false },
+  { key:'mm',   label:'Minale+Mann',   sidford:false },
+  { key:'vita', label:'Vita',          sidford:false },
+];
+
+// 1=yes  0.5=partial  0=no
+// updated: lead magnet row: ASA now 0.5
+const features = [
+  // ── BRAND & DESIGN ──────────────────────────────────────────────────────
+  { cat:'brand', isHeader:true, label:'Brand & Visual Design' },
+  { cat:'brand', label:'Homepage value proposition / tagline',
+    vals:[0,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1] },
+  { cat:'brand', label:'Distinctive visual identity / custom typography',
+    vals:[0,  1,  1,  1,  0.5,1,  1,  1,  1,  1,  0.5,0.5,1,  0.5] },
+  { cat:'brand', label:'Architecture-appropriate restrained aesthetic',
+    vals:[0.5,1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  0.5,1,  1] },
+  { cat:'brand', label:'Full-bleed hero imagery or video',
+    vals:[0,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1] },
+  { cat:'brand', label:'Mobile-responsive design',
+    vals:[0.5,1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1] },
+  { cat:'brand', label:'Firm story / philosophy on About page',
+    vals:[0,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1] },
+  { cat:'brand', label:'Team bios with professional headshots',
+    vals:[1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1] },
+  { cat:'brand', label:'Awards & press section',
+    vals:[0,  1,  0.5,1,  1,  1,  1,  1,  0.5,1,  1,  0.5,1,  0.5] },
+  { cat:'brand', label:'Sustainability / values prominently featured',
+    vals:[0,  1,  1,  0.5,1,  1,  0.5,1,  0,  0.5,1,  0,  0.5,0.5] },
+
+  // ── PORTFOLIO ────────────────────────────────────────────────────────────
+  { cat:'portfolio', isHeader:true, label:'Portfolio' },
+  { cat:'portfolio', label:'Filterable portfolio (type, sector, etc.)',
+    vals:[0,  0.5,1,  1,  1,  1,  1,  1,  0,  0,  1,  1,  0.5,0.5] },
+  { cat:'portfolio', label:'Project listing with name + location + type',
+    vals:[0,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1] },
+  { cat:'portfolio', label:'In-depth project case studies (narrative + specs)',
+    vals:[0.5,1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  0.5] },
+  { cat:'portfolio', label:'Process / drawing documentation shown',
+    vals:[0.5,1,  1,  0.5,1,  1,  1,  1,  0,  0.5,0.5,0.5,1,  0.5] },
+  { cat:'portfolio', label:'Before & after / transformation showcase',
+    vals:[1,  0,  0,  0,  0,  0,  0.5,0.5,0,  1,  0,  0,  0.5,0.5] },
+  { cat:'portfolio', label:'Video walkthroughs or project films',
+    vals:[0,  1,  1,  1,  1,  1,  1,  1,  0,  0,  0.5,0.5,1,  0] },
+
+  // ── LEAD GENERATION ─────────────────────────────────────────────────────
+  { cat:'leads', isHeader:true, label:'Lead Generation & Conversion' },
+  { cat:'leads', label:'Contact / enquiry form',
+    vals:[0,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1] },
+  { cat:'leads', label:'Contextual CTAs throughout site',
+    vals:[0,  0.5,1,  0.5,0.5,1,  0.5,1,  0.5,0.5,1,  1,  0.5,0.5] },
+  { cat:'leads', label:'Client testimonials / social proof',
+    vals:[0,  0,  0,  0,  0,  0,  0,  0.5,0,  1,  1,  1,  1,  1] },
+  { cat:'leads', label:'Separate residential vs commercial pathways',
+    vals:[0,  0,  0,  0,  0,  0,  0,  1,  0,  0,  1,  1,  0,  0.5] },
+  { cat:'leads', label:'Services / process page explaining engagement',
+    vals:[0,  0.5,0.5,0.5,1,  0.5,0.5,1,  0.5,1,  1,  1,  1,  1] },
+  // *** UPDATED: ASA now 0.5 — timed homepage pop-up counts as partial ***
+  { cat:'leads', label:'Lead magnet / downloadable or capture content',
+    vals:[0.5,0,  0,  0,  0,  0,  0,  0,  0,  0,  0.5,0.5,0,  0],
+    asaUpdated: true },
+
+  // ── CONTENT & SEO ────────────────────────────────────────────────────────
+  { cat:'content', isHeader:true, label:'Content & SEO' },
+  { cat:'content', label:'Blog / news / ideas content hub',
+    vals:[0.5,1,  1,  1,  1,  1,  1,  1,  0,  0,  1,  0.5,0.5,0] },
+  { cat:'content', label:'SEO fundamentals (alt text, H1 tags, meta)',
+    vals:[0,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  0.5] },
+  { cat:'content', label:'Google Business / local SEO optimised',
+    vals:[0.5,0,  0,  0,  0,  0,  0,  0.5,0,  1,  0.5,1,  0.5,1] },
+  { cat:'content', label:'Social media integration (beyond basic embed)',
+    vals:[0.5,1,  1,  1,  1,  1,  1,  0.5,0.5,0.5,1,  0.5,0.5,1] },
+];
+
+function icon(v) {
+  if (v === 1)   return '✅';
+  if (v === 0.5) return '⚪';
+  return '❌';
+}
+
+function buildTable(filter) {
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+
+  features.forEach(f => {
+    if (f.isHeader) {
+      if (filter !== 'all' && filter !== f.cat) return;
+      const tr = document.createElement('tr');
+      tr.className = 'category-header';
+      tr.dataset.cat = f.cat;
+      const td = document.createElement('td');
+      td.colSpan = firms.length + 1;
+      td.textContent = f.label;
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+      return;
+    }
+
+    if (filter === 'gaps' && f.vals[0] !== 0) return;
+    if (filter !== 'all' && filter !== 'gaps' && f.cat !== filter) return;
+
+    const tr = document.createElement('tr');
+    tr.dataset.cat = f.cat;
+
+    const labelTd = document.createElement('td');
+    labelTd.textContent = f.label;
+    tr.appendChild(labelTd);
+
+    f.vals.forEach((v, i) => {
+      const td = document.createElement('td');
+      td.textContent = icon(v);
+      if (firms[i].sidford) {
+        td.classList.add('sidford-cell');
+        if (f.asaUpdated) td.classList.add('updated-cell');
+      }
+      tr.appendChild(td);
+    });
+
+    tbody.appendChild(tr);
+  });
+}
+
+function buildScores() {
+  const dataFeatures = features.filter(f => !f.isHeader);
+  const scores = firms.map((firm, i) => {
+    let total = 0;
+    dataFeatures.forEach(f => { total += f.vals[i]; });
+    return { firm, score: total, max: dataFeatures.length };
+  });
+
+  // ASA + top 4 by score
+  const top4 = scores.slice(1).sort((a,b) => b.score - a.score).slice(0,4);
+  const toShow = [scores[0], ...top4];
+
+  const container = document.getElementById('scoreCards');
+  toShow.forEach(s => {
+    const pct = Math.round((s.score / s.max) * 100);
+    const barColor = s.firm.sidford ? '#c8a96e'
+                   : pct > 75 ? '#2d7a4f'
+                   : pct > 55 ? '#4a7fb5' : '#888';
+    const card = document.createElement('div');
+    card.className = 'score-card' + (s.firm.sidford ? ' highlight' : '');
+    card.innerHTML = `
+      <div class="firm">${s.firm.label}</div>
+      <div class="score">${pct}<span>%</span></div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:0;background:${barColor}" data-w="${pct}"></div>
+      </div>`;
+    container.appendChild(card);
+  });
+
+  setTimeout(() => {
+    document.querySelectorAll('.bar-fill').forEach(el => {
+      el.style.width = el.dataset.w + '%';
+    });
+  }, 120);
+}
+
+function filterRows(cat, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  buildTable(cat);
+}
+
+buildScores();
+buildTable('all');
+</script>
+</body>
+</html>
