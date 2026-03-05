@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASA Website Improvement Proposal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F0E8;
+    --warm-white: #FAF8F4;
+    --charcoal: #1C1C1A;
+    --mid-grey: #6B6B68;
+    --light-grey: #D4CFC6;
+    --accent: #8B3A2A;
+    --accent-light: #C4614E;
+    --gold: #B8956A;
+    --dark-brown: #2A1F18;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--charcoal);
+    color: var(--cream);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+  }
+
+  /* SIDEBAR */
+  #sidebar {
+    width: 220px;
+    min-width: 220px;
+    background: #111110;
+    border-right: 1px solid #2A2A28;
+    display: flex;
+    flex-direction: column;
+    padding: 32px 0;
+    overflow-y: auto;
+    z-index: 10;
+  }
+
+  .sidebar-logo {
+    padding: 0 24px 28px;
+    border-bottom: 1px solid #2A2A28;
+    margin-bottom: 20px;
+  }
+
+  .sidebar-logo .firm {
+    font-family: 'Playfair Display', serif;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    line-height: 1.6;
+  }
+
+  .sidebar-logo .subtitle {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--mid-grey);
+    margin-top: 4px;
+  }
+
+  .chapter-group { margin-bottom: 6px; }
+
+  .chapter-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px 24px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #5A5A58;
+    transition: all 0.2s ease;
+    line-height: 1.5;
+    position: relative;
+  }
+
+  .chapter-btn::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 24px;
+    background: var(--accent);
+    transition: width 0.2s ease;
+  }
+
+  .chapter-btn:hover { color: var(--cream); }
+  .chapter-btn:hover::before { width: 2px; }
+
+  .chapter-btn.active {
+    color: var(--cream);
+    font-weight: 500;
+  }
+  .chapter-btn.active::before { width: 2px; background: var(--accent); }
+
+  .slide-count-small {
+    font-size: 8px;
+    color: #3A3A38;
+    margin-left: 4px;
+  }
+
+  /* MAIN AREA */
+  #main {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* SLIDE COUNTER */
+  #counter {
+    position: fixed;
+    top: 24px;
+    right: 32px;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--mid-grey);
+    font-weight: 300;
+    z-index: 100;
+  }
+
+  /* SLIDES */
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    padding: 64px 72px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .slide.active {
+    display: flex;
+  }
+
+  /* Slide layouts */
+  .slide-content {
+    width: 100%;
+    max-width: 960px;
+  }
+
+  /* CHAPTER TITLE SLIDE */
+  .slide-chapter {
+    background: var(--charcoal);
+  }
+
+  .slide-chapter .slide-content {
+    display: flex;
+    align-items: flex-end;
+    height: 100%;
+    padding-bottom: 48px;
+  }
+
+  .chapter-label {
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent-light);
+    margin-bottom: 16px;
+    font-weight: 400;
+  }
+
+  .chapter-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 120px;
+    line-height: 1;
+    color: #2A2A28;
+    position: absolute;
+    right: 72px;
+    top: 50%;
+    transform: translateY(-60%);
+    font-weight: 600;
+    letter-spacing: -0.04em;
+  }
+
+  .chapter-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 52px;
+    line-height: 1.1;
+    color: var(--cream);
+    font-weight: 400;
+    max-width: 600px;
+  }
+
+  .chapter-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  /* STANDARD CONTENT SLIDE */
+  .slide-standard {
+    background: var(--warm-white);
+    color: var(--charcoal);
+  }
+
+  .slide-standard .eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+    font-weight: 500;
+  }
+
+  .slide-standard h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 38px;
+    line-height: 1.15;
+    color: var(--charcoal);
+    font-weight: 400;
+    margin-bottom: 36px;
+    max-width: 700px;
+  }
+
+  /* STAT SLIDE */
+  .slide-stat {
+    background: var(--charcoal);
+  }
+
+  .big-stat {
+    font-family: 'Playfair Display', serif;
+    font-size: 160px;
+    line-height: 0.9;
+    font-weight: 600;
+    color: var(--cream);
+    letter-spacing: -0.04em;
+  }
+
+  .big-stat .unit {
+    font-size: 60px;
+    vertical-align: super;
+    color: var(--accent-light);
+  }
+
+  .stat-label {
+    font-size: 18px;
+    color: var(--mid-grey);
+    font-weight: 300;
+    margin-top: 20px;
+    max-width: 480px;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+  }
+
+  .stat-source {
+    font-size: 10px;
+    color: #3A3A38;
+    margin-top: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* DARK ACCENT SLIDE */
+  .slide-dark {
+    background: #111110;
+  }
+
+  /* TWO COLUMN */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+
+  .col-divider {
+    border-left: 1px solid var(--light-grey);
+    padding-left: 48px;
+  }
+
+  /* PILL TAGS */
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 8px 16px;
+    border: 1px solid;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 400;
+    border-radius: 0;
+  }
+
+  .tag-critical {
+    border-color: var(--accent);
+    color: var(--accent-light);
+    background: rgba(139,58,42,0.08);
+  }
+
+  .tag-high {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(184,149,106,0.08);
+  }
+
+  .tag-medium {
+    border-color: #4A5A6A;
+    color: #7A9AAA;
+    background: rgba(74,90,106,0.08);
+  }
+
+  /* FEATURE ROW LIST */
+  .feature-list {
+    list-style: none;
+    margin-top: 8px;
+  }
+
+  .feature-list li {
+    padding: 14px 0;
+    border-bottom: 1px solid;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.5;
+  }
+
+  .feature-list.light li { border-color: var(--light-grey); color: var(--charcoal); }
+  .feature-list.dark li { border-color: #2A2A28; color: var(--cream); }
+
+  .feature-list .gap-badge {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 3px 8px;
+    border-radius: 0;
+    font-weight: 500;
+    flex-shrink: 0;
+    margin-left: 16px;
+  }
+
+  /* QUOTE SLIDE */
+  .slide-quote {
+    background: var(--accent);
+  }
+
+  .big-quote {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    line-height: 1.35;
+    font-weight: 400;
+    font-style: italic;
+    color: #fff;
+    max-width: 760px;
+  }
+
+  .quote-attr {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    margin-top: 28px;
+    font-style: normal;
+  }
+
+  /* BEFORE/AFTER */
+  .vs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin-top: 32px;
+  }
+
+  .vs-col {
+    padding: 24px;
+  }
+
+  .vs-col.before {
+    background: #EEEAE2;
+    color: #1C1C1A;
+  }
+
+  .vs-col.after {
+    background: var(--charcoal);
+    color: var(--cream);
+  }
+
+  .vs-label {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+
+  .vs-col.before .vs-label { color: var(--accent); }
+  .vs-col.after .vs-label { color: var(--gold); }
+
+  .vs-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: inherit;
+  }
+
+  .vs-item .dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 7px;
+  }
+
+  .vs-col.before .dot { background: var(--accent); }
+  .vs-col.after .dot { background: var(--gold); }
+
+  /* TIMELINE PHASE */
+  .phase-block {
+    border-left: 2px solid var(--accent);
+    padding: 0 0 32px 28px;
+    position: relative;
+  }
+
+  .phase-block::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+    background: var(--warm-white);
+    position: absolute;
+    left: -6px;
+    top: 4px;
+  }
+
+  .phase-block:last-child { padding-bottom: 0; }
+
+  .phase-num {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .phase-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--charcoal);
+    margin-bottom: 4px;
+  }
+
+  .phase-meta {
+    font-size: 11px;
+    color: var(--mid-grey);
+    margin-bottom: 10px;
+  }
+
+  .phase-items {
+    font-size: 13px;
+    color: #3A3A38;
+    line-height: 2;
+  }
+
+  /* GRID CARDS */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 28px;
+  }
+
+  .card {
+    padding: 20px;
+    border: 1px solid var(--light-grey);
+    position: relative;
+  }
+
+  .card .card-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    color: var(--accent);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .card .card-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--charcoal);
+    margin-bottom: 6px;
+    letter-spacing: 0.02em;
+  }
+
+  .card .card-body {
+    font-size: 11px;
+    color: var(--mid-grey);
+    line-height: 1.6;
+  }
+
+  /* BENCHMARK FIRMS */
+  .firm-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: #2A2A28;
+    margin-top: 28px;
+    border: 1px solid #2A2A28;
+  }
+
+  .firm-cell {
+    background: #171715;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .firm-name {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    color: var(--cream);
+    margin-bottom: 4px;
+  }
+
+  .firm-type {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--mid-grey);
+  }
+
+  /* GAP TABLE */
+  .gap-table {
+    width: 100%;
+    margin-top: 24px;
+    border-collapse: collapse;
+  }
+
+  .gap-table th {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--mid-grey);
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid #2A2A28;
+    font-weight: 400;
+  }
+
+  .gap-table td {
+    font-size: 12px;
+    padding: 12px 12px;
+    border-bottom: 1px solid #1E1E1C;
+    color: var(--cream);
+    font-weight: 300;
+    vertical-align: middle;
+  }
+
+  .gap-table tr:last-child td { border-bottom: none; }
+
+  .sev {
+    display: inline-block;
+    padding: 3px 10px;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 500;
+  }
+
+  .sev-critical { background: rgba(139,58,42,0.25); color: #E8745A; }
+  .sev-high { background: rgba(184,149,106,0.15); color: var(--gold); }
+  .sev-medium { background: rgba(74,90,106,0.15); color: #7A9AAA; }
+
+  /* ROADMAP VISUAL */
+  .roadmap {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 32px;
+  }
+
+  .roadmap-phase {
+    padding: 28px 24px;
+    position: relative;
+  }
+
+  .roadmap-phase.p1 { background: rgba(139,58,42,0.12); border-top: 3px solid var(--accent); }
+  .roadmap-phase.p2 { background: rgba(184,149,106,0.08); border-top: 3px solid var(--gold); }
+  .roadmap-phase.p3 { background: rgba(100,120,140,0.08); border-top: 3px solid #4A6A8A; }
+
+  .rp-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .p1 .rp-label { color: var(--accent-light); }
+  .p2 .rp-label { color: var(--gold); }
+  .p3 .rp-label { color: #6A9ABB; }
+
+  .rp-time {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    color: var(--cream);
+    margin-bottom: 16px;
+  }
+
+  .rp-items {
+    list-style: none;
+  }
+
+  .rp-items li {
+    font-size: 12px;
+    color: #8A8A88;
+    padding: 5px 0;
+    border-bottom: 1px solid #2A2A28;
+    line-height: 1.4;
+  }
+
+  .rp-items li:last-child { border-bottom: none; }
+
+  /* CLOSE SLIDE */
+  .slide-close {
+    background: var(--dark-brown);
+  }
+
+  /* ARROW HINT */
+  #nav-hint {
+    position: fixed;
+    bottom: 28px;
+    right: 32px;
+    display: flex;
+    gap: 8px;
+    z-index: 100;
+  }
+
+  .nav-arrow {
+    width: 36px;
+    height: 36px;
+    border: 1px solid #2A2A28;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: none;
+    color: var(--mid-grey);
+    font-size: 14px;
+  }
+
+  .nav-arrow:hover {
+    border-color: var(--accent);
+    color: var(--cream);
+  }
+
+  /* DIVIDER LINE */
+  .rule {
+    width: 48px;
+    height: 1px;
+    background: var(--accent);
+    margin: 20px 0;
+  }
+
+  .rule-gold { background: var(--gold); }
+
+  /* BODY TEXT SIZES */
+  .body-lg {
+    font-size: 18px;
+    font-weight: 300;
+    line-height: 1.65;
+    color: var(--charcoal);
+  }
+
+  .body-md {
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--mid-grey);
+  }
+
+  .emphasis {
+    font-weight: 500;
+    color: var(--charcoal);
+  }
+
+  .accent-text { color: var(--accent); }
+  .gold-text { color: var(--gold); }
+
+  /* ICON/NUMBER pairs */
+  .kpi-row {
+    display: flex;
+    gap: 48px;
+    margin-top: 32px;
+  }
+
+  .kpi {
+    flex: 1;
+    padding: 24px;
+    border-top: 2px solid;
+  }
+
+  .kpi.k1 { border-color: var(--accent); }
+  .kpi.k2 { border-color: var(--gold); }
+  .kpi.k3 { border-color: #4A6A8A; }
+
+  .kpi-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    color: var(--charcoal);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .kpi-desc {
+    font-size: 12px;
+    color: var(--mid-grey);
+    line-height: 1.5;
+  }
+
+  /* Progress bar */
+  #progress {
+    position: fixed;
+    bottom: 0;
+    left: 220px;
+    right: 0;
+    height: 2px;
+    background: #1E1E1C;
+    z-index: 50;
+  }
+
+  #progress-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.4s ease;
+  }
+
+  /* Transition */
+  .slide { transition: opacity 0.3s ease; opacity: 0; }
+  .slide.active { opacity: 1; }
+
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="sidebar-logo">
+    <div class="firm">Andrew Sidford<br>Architects</div>
+    <div class="subtitle">Website Proposal · 2026</div>
+  </div>
+  <div id="chapter-nav"></div>
+</nav>
+
+<!-- SLIDE COUNTER -->
+<div id="counter">1 / 28</div>
+
+<!-- PROGRESS -->
+<div id="progress"><div id="progress-fill"></div></div>
+
+<!-- NAV ARROWS -->
+<div id="nav-hint">
+  <button class="nav-arrow" onclick="prevSlide()">←</button>
+  <button class="nav-arrow" onclick="nextSlide()">→</button>
+</div>
+
+<!-- MAIN -->
+<main id="main">
+
+<!-- ═══════════════════════════════════════ -->
+<!-- CHAPTER 1: THE PROBLEM -->
+<!-- ═══════════════════════════════════════ -->
+
+<!-- SLIDE 1 — Chapter intro -->
+<div class="slide slide-chapter active" data-chapter="The Problem">
+  <span class="chapter-number">01</span>
+  <div class="slide-content">
+    <div class="chapter-label">Chapter One</div>
+    <h1 class="chapter-title">The<br><em>Problem</em></h1>
+  </div>
+</div>
+
+<!-- SLIDE 2 — The core gap -->
+<div class="slide slide-standard" data-chapter="The Problem">
+  <div class="slide-content">
+    <div class="eyebrow">The Core Issue</div>
+    <h2>30 years of award-winning work.<br>A website that tells none of it.</h2>
+    <div class="kpi-row">
+      <div class="kpi k1">
+        <div class="kpi-val">30</div>
+        <div class="kpi-desc">Years of practice &amp; client relationships</div>
+      </div>
+      <div class="kpi k2">
+        <div class="kpi-val">0</div>
+        <div class="kpi-desc">Words of body copy on the homepage</div>
+      </div>
+      <div class="kpi k3">
+        <div class="kpi-val">0</div>
+        <div class="kpi-desc">Contact forms anywhere on the site</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 3 — Stat: 84% -->
+<div class="slide slide-stat" data-chapter="The Problem">
+  <div class="slide-content">
+    <div class="big-stat"><span class="unit">%</span>84</div>
+    <div class="stat-label">of potential clients visit a firm's website before ever making contact — and 9 in 10 will rule out a firm based on that visit alone.</div>
+    <div class="stat-source">Research: Vernacular / Hinge Institute</div>
+  </div>
+</div>
+
+<!-- SLIDE 4 — Stat: 68% -->
+<div class="slide slide-stat" data-chapter="The Problem">
+  <div class="slide-content">
+    <div class="big-stat"><span class="unit">%</span>68</div>
+    <div class="stat-label">of all clicks go to the top three Google results. The gap between ASA's work and its web presence is the firm's single largest marketing vulnerability.</div>
+    <div class="stat-source">Research: Vernacular</div>
+  </div>
+</div>
+
+<!-- SLIDE 5 — What's invisible -->
+<div class="slide slide-dark" data-chapter="The Problem">
+  <div class="slide-content">
+    <div class="chapter-label" style="color:var(--accent-light)">Hidden Strengths</div>
+    <h2 style="font-family:'Playfair Display',serif; font-size:36px; color:var(--cream); font-weight:400; margin-bottom:28px; line-height:1.2;">These assets exist.<br>None appear on the website.</h2>
+    <div class="tag-list">
+      <span class="tag tag-critical">AIA NH Award</span>
+      <span class="tag tag-critical">Boston Globe Feature</span>
+      <span class="tag tag-critical">1% For The Planet Pioneer</span>
+      <span class="tag tag-high">HGTV Appearances</span>
+      <span class="tag tag-high">Design New England</span>
+      <span class="tag tag-high">Northshore Magazine</span>
+      <span class="tag tag-medium">NYC Expansion 2025</span>
+      <span class="tag tag-medium">30-Year Track Record</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- CHAPTER 2: WHAT'S WORKING -->
+<!-- ═══════════════════════════════════════ -->
+
+<!-- SLIDE 6 — Chapter intro -->
+<div class="slide slide-chapter" data-chapter="What's Working">
+  <span class="chapter-number">02</span>
+  <div class="slide-content">
+    <div class="chapter-label">Chapter Two</div>
+    <h1 class="chapter-title">What's<br><em>Working</em></h1>
+  </div>
+</div>
+
+<!-- SLIDE 7 — Raw materials -->
+<div class="slide slide-standard" data-chapter="What's Working">
+  <div class="slide-content">
+    <div class="eyebrow">Strong Foundation</div>
+    <h2>The raw materials are excellent.</h2>
+    <div class="two-col" style="margin-top:28px;">
+      <div>
+        <ul class="feature-list light">
+          <li>Professional photography <span style="font-size:11px;color:var(--mid-grey)">(Vanderwarker, Karosis Auger)</span></li>
+          <li>Compelling project narratives</li>
+          <li>6 team members with substantive bios</li>
+          <li>Clean, readable URL structure</li>
+        </ul>
+      </div>
+      <div class="col-divider">
+        <div style="font-size:13px;color:var(--mid-grey);line-height:1.8;">
+          <p style="margin-bottom:12px;">Jimmy's Jazz &amp; Blues Club project page includes <span class="emphasis">200-word narratives</span>, 24+ photos, before-condition images, and architectural drawings.</p>
+          <p>The firm has better raw material than most of the small practices benchmarked.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- CHAPTER 3: WHAT'S MISSING -->
+<!-- ═══════════════════════════════════════ -->
+
+<!-- SLIDE 8 — Chapter intro -->
+<div class="slide slide-chapter" data-chapter="What's Missing">
+  <span class="chapter-number">03</span>
+  <div class="slide-content">
+    <div class="chapter-label">Chapter Three</div>
+    <h1 class="chapter-title">What's<br><em>Missing</em></h1>
+  </div>
+</div>
+
+<!-- SLIDE 9 — Critical gaps -->
+<div class="slide slide-dark" data-chapter="What's Missing">
+  <div class="slide-content">
+    <div class="chapter-label" style="color:var(--accent-light)">Critical Gaps</div>
+    <h2 style="font-family:'Playfair Display',serif; font-size:30px; color:var(--cream); font-weight:400; margin-bottom:24px;">Everything that converts visitors is absent.</h2>
+    <table class="gap-table">
+      <thead>
+        <tr>
+          <th>Missing Element</th>
+          <th>Why It Matters</th>
+          <th>Severity</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Homepage value proposition</td>
+          <td>Zero body copy — no headline, no tagline</td>
+          <td><span class="sev sev-critical">Critical</span></td>
+        </tr>
+        <tr>
+          <td>Contact form</td>
+          <td>Email-only creates unnecessary friction</td>
+          <td><span class="sev sev-critical">Critical</span></td>
+        </tr>
+        <tr>
+          <td>About page</td>
+          <td>Exists in nav but content is empty/broken</td>
+          <td><span class="sev sev-critical">Critical</span></td>
+        </tr>
+        <tr>
+          <td>Services page</td>
+          <td>Clients don't know what ASA offers</td>
+          <td><span class="sev sev-critical">Critical</span></td>
+        </tr>
+        <tr>
+          <td>Testimonials</td>
+          <td>No social proof despite 30-year track record</td>
+          <td><span class="sev sev-high">High</span></td>
+        </tr>
+        <tr>
+          <td>Awards &amp; Press</td>
+          <td>AIA, Globe, HGTV — invisible online</td>
+          <td><span class="sev sev-high">High</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SLIDE 10 — Quote -->
+<div class="slide slide-quote" data-chapter="What's Missing">
+  <div class="slide-content">
+    <p class="big-quote">"Andrew Sidford Architects wants to raise your expectations of what architecture can be."</p>
+    <div class="rule" style="background:rgba(255,255,255,0.3); margin-top:32px;"></div>
+    <p class="quote-attr">This powerful statement appears on Houzz. It is invisible on the firm's own website.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- CHAPTER 4: BENCHMARK FIRMS -->
+<!-- ═══════════════════════════════════════ -->
+
+<!-- SLIDE 11 — Chapter intro -->
+<div class="slide slide-chapter" data-chapter="Benchmark Analysis">
+  <span class="chapter-number">04</span>
+  <div class="slide-content">
+    <div class="chapter-label">Chapter Four</div>
+    <h1 class="chapter-title">Benchmark<br><em>Analysis</em></h1>
+  </div>
+</div>
+
+<!-- SLIDE 12 — 14 firms -->
+<div class="slide slide-dark" data-chapter="Benchmark Analysis">
+  <div class="slide-content">
+    <div class="chapter-label" style="color:var(--gold)">Research Scope</div>
+    <h2 style="font-family:'Playfair Display',serif; font-size:32px; color:var(--cream); font-weight:400; margin-bottom:24px;">14 leading architecture firms analyzed.</h2>
+    <div class="firm-grid">
+      <div class="firm-cell"><div class="firm-name">Snøhetta</div><div class="firm-type">Large · Oslo/NY</div></div>
+      <div class="firm-cell"><div class="firm-name">BIG</div><div class="firm-type">Large · Copenhagen</div></div>
+      <div class="firm-cell"><div class="firm-name">Studio Gang</div><div class="firm-type">Large · Chicago</div></div>
+      <div class="firm-cell"><div class="firm-name">Zaha Hadid</div><div class="firm-type">Large · London</div></div>
+      <div class="firm-cell"><div class="firm-name">Foster + Partners</div><div class="firm-type">Large · London</div></div>
+      <div class="firm-cell"><div class="firm-name">Heatherwick</div><div class="firm-type">Large · London</div></div>
+      <div class="firm-cell"><div class="firm-name">Olson Kundig</div><div class="firm-type">Mid · Seattle</div></div>
+      <div class="firm-cell"><div class="firm-name">Selldorf</div><div class="firm-type">Small · New York</div></div>
+      <div class="firm-cell"><div class="firm-name">Andersson/Wise</div><div class="firm-type">Small · Austin</div></div>
+      <div class="firm-cell"><div class="firm-name">Ayers Saint Gross</div><div class="firm-type">Mid · Baltimore</div></div>
+      <div class="firm-cell"><div class="firm-name">Mohagen Hansen</div><div class="firm-type">Mid · Minnesota</div></div>
+      <div class="firm-cell"><div class="firm-name">Minale + Mann</div><div class="firm-type">Small</div></div>
+      <div class="firm-cell"><div class="firm-name">Vita Architecture</div><div class="firm-type">Small</div></div>
+      <div class="firm-cell"><div class="firm-name">Shape Studio</div><div class="firm-type">Small</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 13 — What every firm does -->
+<div class="slide slide-standard" data-chapter="Benchmark Analysis">
+  <div class="slide-content">
+    <div class="eyebrow">Universal Standard</div>
+    <h2>Every single benchmarked firm does these things.</h2>
+    <div class="kpi-row" style="margin-top:24px;">
+      <div class="kpi k1">
+        <div class="kpi-val" style="font-size:36px; margin-bottom:10px;">14/14</div>
+        <div class="kpi-desc">Clear differentiator statement on homepage</div>
+      </div>
+      <div class="kpi k2">
+        <div class="kpi-val" style="font-size:36px; margin-bottom:10px;">14/14</div>
+        <div class="kpi-desc">Contact form on the site</div>
+      </div>
+      <div class="kpi k3">
+        <div class="kpi-val" style="font-size:36px; margin-bottom:10px;">14/14</div>
+        <div class="kpi-desc">Tell their firm story in their own words</div>
+      </div>
+    </div>
+    <p class="body-md" style="margin-top:28px;font-size:13px;">ASA does none of these things — despite having better raw material than most of the small firms analyzed.</p>
+  </div>
+</div>
+
+<!-- SLIDE 14 — Selldorf model -->
+<div class="slide slide-standard" data-chapter="Benchmark Analysis">
+  <div class="slide-content">
+    <div class="eyebrow">Most Relevant Model for ASA</div>
+    <h2>Selldorf Architects: the website IS the brand statement.</h2>
+    <div class="two-col" style="margin-top:28px; align-items: start;">
+      <div>
+        <p class="body-md" style="margin-bottom:20px;">A boutique New York firm. Restrained, elegant, precise. Black-and-white palette lets colorful photography dominate entirely.</p>
+        <p class="body-md">Its differentiator is on the homepage: <em style="color:var(--charcoal); font-style:italic;">"Since its inception the firm's design ethos has been deeply rooted in the principles of humanism."</em></p>
+      </div>
+      <div class="col-divider">
+        <p class="body-md" style="margin-bottom:16px;"><strong style="display:block;color:var(--charcoal);font-size:13px;margin-bottom:6px;">The lesson:</strong>A small firm's website can convey quiet authority without flash. You don't need scale to compete.</p>
+        <div class="rule"></div>
+        <p style="font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:0.1em;">This is the model for ASA's redesign.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- CHAPTER 5: GAP ANALYSIS -->
+<!-- ═══════════════════════════════════════ -->
+
+<!-- SLIDE 15 — Chapter intro -->
+<div class="slide slide-chapter" data-chapter="Gap Analysis">
+  <span class="chapter-number">05</span>
+  <div class="slide-content">
+    <div class="chapter-label">Chapter Five</div>
+    <h1 class="chapter-title">Gap<br><em>Analysis</em></h1>
+  </div>
+</div>
+
+<!-- SLIDE 16 — Full gap table -->
+<div class="slide slide-dark" data-chapter="Gap Analysis">
+  <div class="slide-content">
+    <div class="chapter-label" style="color:var(--gold)">Competitive Comparison</div>
+    <table class="gap-table">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>ASA Today</th>
+          <th>Best Practice</th>
+          <th>Gap</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Homepage proposition</td>
+          <td style="color:#5A5A58">None</td>
+          <td style="color:#7A9A7A">Clear differentiator</td>
+          <td><span class="sev sev-critical">Critical</span></td>
+        </tr>
+        <tr>
+          <td>Lead capture</td>
+          <td style="color:#5A5A58">Email only</td>
+          <td style="color:#7A9A7A">Forms on multiple pages</td>
+          <td><span class="sev sev-critical">Critical</span></td>
+        </tr>
+        <tr>
+          <td>Portfolio filtering</td>
+          <td style="color:#5A5A58">Manual browse</td>
+          <td style="color:#7A9A7A">Multi-axis (type, sector, geo)</td>
+          <td><span class="sev sev-high">High</span></td>
+        </tr>
+        <tr>
+          <td>Social proof</td>
+          <td style="color:#5A5A58">None visible</td>
+          <td style="color:#7A9A7A">Testimonials + press logos</td>
+          <td><span class="sev sev-high">High</span></td>
+        </tr>
+        <tr>
+          <td>CTA strategy</td>
+          <td style="color:#5A5A58">Portfolio links only</td>
+          <td style="color:#7A9A7A">Contextual CTAs every page</td>
+          <td><span class="sev sev-high">High</span></td>
+        </tr>
+        <tr>
+          <td>SEO fundamentals</td>
+          <td style="color:#5A5A58">Missing alt text, wrong H tags</td>
+          <td style="color:#7A9A7A">Optimized + schema markup</td>
+          <td><span class="sev sev-high">High</span></td>
+        </tr>
+        <tr>
+          <td>Content marketing</td>
+          <td style="color:#5A5A58">Underutilized</td>
+          <td style="color:#7A9A7A">Regular SEO-driving content</td>
+          <td><span class="sev sev-medium">Medium</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- CHAPTER 6: PHASE 1 QUICK WINS -->
+<!-- ═══════════════════════════════════════ -->
+
+<!-- SLIDE 17 — Chapter intro -->
+<div class="slide slide-chapter" data-chapter="Phase 1: Quick Wins">
+  <span class="chapter-number">06</span>
+  <div class="slide-content">
+    <div class="chapter-label">Chapter Six</div>
+    <h1 class="chapter-title">Phase 1:<br><em>Quick Wins</em></h1>
+  </div>
+</div>
+
+<!-- SLIDE 18 — Quick wins detail -->
+<div class="slide slide-standard" data-chapter="Phase 1: Quick Wins">
+  <div class="slide-content">
+    <div class="eyebrow">Weeks 1–4 · Minimal Cost · No Redesign Required</div>
+    <h2>Six changes. Maximum immediate impact.</h2>
+    <div class="two-col" style="margin-top:20px;gap:32px;">
+      <div>
+        <ul class="feature-list light" style="font-size:13px;">
+          <li style="padding:12px 0;">
+            <span><strong style="display:block;margin-bottom:2px;">Homepage hero statement</strong>Place the firm's differentiator above the fold with a "Schedule a Consultation" CTA</span>
+          </li>
+          <li style="padding:12px 0;">
+            <span><strong style="display:block;margin-bottom:2px;">Contact form</strong>Simple Wix native form: name, email, project type, description, timeline</span>
+          </li>
+          <li style="padding:12px 0;">
+            <span><strong style="display:block;margin-bottom:2px;">Fix the About page</strong>Populate with philosophy, 1% For The Planet story, NYC expansion</span>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <ul class="feature-list light" style="font-size:13px;">
+          <li style="padding:12px 0;">
+            <span><strong style="display:block;margin-bottom:2px;">Update outdated details</strong>Copyright → 2026, Cindy's title → Partner, remove job-posting from homepage</span>
+          </li>
+          <li style="padding:12px 0;">
+            <span><strong style="display:block;margin-bottom:2px;">Awards &amp; Press section</strong>AIA NH, Boston Globe, Design New England, HGTV — with publication logos</span>
+          </li>
+          <li style="padding:12px 0;">
+            <span><strong style="display:block;margin-bottom:2px;">Fix image alt text &amp; headings</strong>Replace filenames with descriptions; change H5 project titles to H1</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- CHAPTER 7: PHASE 2 MEDIUM TERM -->
+<!-- ═══════════════════════════════════════ -->
+
+<!-- SLIDE 19 — Chapter intro -->
+<div class="slide slide-chapter" data-chapter="Phase 2: Medium-Term">
+  <span class="chapter-number">07</span>
+  <div class="slide-content">
+    <div class="chapter-label">Chapter Seven</div>
+    <h1 class="chapter-title">Phase 2:<br><em>Medium-Term</em></h1>
+  </div>
+</div>
+
+<!-- SLIDE 20 — Phase 2 items -->
+<div class="slide slide-standard" data-chapter="Phase 2: Medium-Term">
+  <div class="slide-content">
+    <div class="eyebrow">Months 2–4 · Moderate Investment</div>
+    <h2>Build the conversion engine.</h2>
+    <div class="card-grid" style="margin-top:24px;">
+      <div class="card">
+        <div class="card-num">01</div>
+        <div class="card-title">Services / Process Page</div>
+        <div class="card-body">Step-by-step journey from consultation to construction administration. Residential vs. commercial pathways.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">02</div>
+        <div class="card-title">Portfolio Mini Case Studies</div>
+        <div class="card-body">Add location, year, type to listings. Expand all projects to follow Jimmy's narrative format.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">03</div>
+        <div class="card-title">Testimonial Programme</div>
+        <div class="card-body">Reach 5–10 past clients. Strongest 2–3 on homepage. Pair others with project pages.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">04</div>
+        <div class="card-title">Contextual CTAs</div>
+        <div class="card-body">"Considering a similar project?" on every project page. Benchmarked from Mohagen Hansen.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">05</div>
+        <div class="card-title">Blog + Local SEO</div>
+        <div class="card-body">1 post/month targeting local search queries. Google Business Profile optimization.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">06</div>
+        <div class="card-title">Audience Pathways</div>
+        <div class="card-body">Residential vs. Commercial self-selection. Different emotional triggers for each segment.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 21 — SEO stat -->
+<div class="slide slide-stat" data-chapter="Phase 2: Medium-Term">
+  <div class="slide-content">
+    <div class="big-stat"><span class="unit">%</span>50</div>
+    <div class="stat-label">more organic traffic seen by firms that publish regular blog content, compared to those without. Target: "residential architect Newburyport MA" — low competition, high intent.</div>
+    <div class="stat-source">Industry Research</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- CHAPTER 8: PHASE 3 REDESIGN -->
+<!-- ═══════════════════════════════════════ -->
+
+<!-- SLIDE 22 — Chapter intro -->
+<div class="slide slide-chapter" data-chapter="Phase 3: Full Redesign">
+  <span class="chapter-number">08</span>
+  <div class="slide-content">
+    <div class="chapter-label">Chapter Eight</div>
+    <h1 class="chapter-title">Phase 3:<br><em>Full Redesign</em></h1>
+  </div>
+</div>
+
+<!-- SLIDE 23 — Platform + visual identity -->
+<div class="slide slide-standard" data-chapter="Phase 3: Full Redesign">
+  <div class="slide-content">
+    <div class="eyebrow">Months 4–8 · Significant Investment</div>
+    <h2>Migrate. Redesign. Differentiate.</h2>
+    <div class="two-col" style="margin-top:28px;">
+      <div>
+        <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.15em;color:var(--accent);margin-bottom:12px;">Platform: Wix → Webflow</p>
+        <ul class="feature-list light" style="font-size:13px;">
+          <li>Code-free design flexibility</li>
+          <li>Built-in CMS for projects &amp; blog</li>
+          <li>Excellent SEO tools</li>
+          <li>Fast hosting on AWS</li>
+          <li>Client-editable without developer</li>
+        </ul>
+      </div>
+      <div class="col-divider">
+        <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.15em;color:var(--accent);margin-bottom:12px;">Visual Direction: Selldorf Model</p>
+        <p class="body-md" style="font-size:13px;margin-bottom:14px;">Restrained palette of black, white &amp; warm greys. Monochromatic interface lets project photography dominate.</p>
+        <p class="body-md" style="font-size:13px;">One refined sans-serif family. Generous, intentional whitespace — framing photography like a gallery wall.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 24 — Before/After vision -->
+<div class="slide" style="background:var(--warm-white); padding:0;" data-chapter="Phase 3: Full Redesign">
+  <div style="width:100%; height:100%; display:flex; flex-direction:column; justify-content:center; padding: 48px 72px;">
+    <div class="eyebrow" style="color:var(--accent);margin-bottom:20px;">Homepage Transformation</div>
+    <div class="vs-grid" style="margin-top:0;">
+      <div class="vs-col before">
+        <div class="vs-label">Today</div>
+        <div class="vs-item"><span class="dot"></span><span>Portfolio thumbnail grid with no context</span></div>
+        <div class="vs-item"><span class="dot"></span><span>Instagram feed showing a job posting</span></div>
+        <div class="vs-item"><span class="dot"></span><span>Zero body copy, no firm description</span></div>
+        <div class="vs-item"><span class="dot"></span><span>No CTA, no contact form</span></div>
+        <div class="vs-item"><span class="dot"></span><span>Copyright: 2021</span></div>
+      </div>
+      <div class="vs-col after">
+        <div class="vs-label">Proposed</div>
+        <div class="vs-item"><span class="dot"></span><span>Full-bleed hero with firm tagline + CTA</span></div>
+        <div class="vs-item"><span class="dot"></span><span>8–12 curated featured projects as image cards</span></div>
+        <div class="vs-item"><span class="dot"></span><span>Testimonial block + awards/press logo bar</span></div>
+        <div class="vs-item"><span class="dot"></span><span>Residential / Commercial audience pathways</span></div>
+        <div class="vs-item"><span class="dot"></span><span>Sustainability story: 1% For The Planet 2006</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 25 — Sustainable web design -->
+<div class="slide slide-dark" data-chapter="Phase 3: Full Redesign">
+  <div class="slide-content">
+    <div class="chapter-label" style="color:var(--gold)">Brand Extension Opportunity</div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:38px;color:var(--cream);font-weight:400;margin-bottom:24px;">ASA was first.<br>The website should say so.</h2>
+    <div class="two-col">
+      <div>
+        <p style="font-size:14px;color:#C8C4BC;line-height:1.8;margin-bottom:16px;">ASA was the first architecture firm to join 1% For The Planet — in 2006, ahead of the entire industry.</p>
+        <p style="font-size:14px;color:#C8C4BC;line-height:1.8;">The redesigned website should itself be sustainably designed: optimized images, minimal JS, green hosting, published carbon footprint score.</p>
+      </div>
+      <div class="col-divider" style="border-color:#484844;">
+        <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);margin-bottom:12px;">Model: Snøhetta.com</p>
+        <ul style="list-style:none;">
+          <li style="font-size:13px;color:#D8D4CC;padding:11px 0;border-bottom:1px solid #484844;">97/100 Google Lighthouse score</li>
+          <li style="font-size:13px;color:#D8D4CC;padding:11px 0;border-bottom:1px solid #484844;">0.09g CO₂ per page view</li>
+          <li style="font-size:13px;color:#D8D4CC;padding:11px 0;border-bottom:1px solid #484844;">Custom typeface as brand identity</li>
+          <li style="font-size:13px;color:#D8D4CC;padding:11px 0;">Constraint → visual identity</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- CHAPTER 9: EXPECTED IMPACT -->
+<!-- ═══════════════════════════════════════ -->
+
+<!-- SLIDE 26 — Chapter intro -->
+<div class="slide slide-chapter" data-chapter="Expected Impact">
+  <span class="chapter-number">09</span>
+  <div class="slide-content">
+    <div class="chapter-label">Chapter Nine</div>
+    <h1 class="chapter-title">Expected<br><em>Impact</em></h1>
+  </div>
+</div>
+
+<!-- SLIDE 27 — Roadmap / phases -->
+<div class="slide slide-dark" data-chapter="Expected Impact">
+  <div class="slide-content">
+    <div class="chapter-label" style="color:var(--gold)">Three-Phase Roadmap</div>
+    <div class="roadmap">
+      <div class="roadmap-phase p1">
+        <div class="rp-label">Phase 1</div>
+        <div class="rp-time">Weeks 1–4</div>
+        <ul class="rp-items">
+          <li>Homepage hero + CTA</li>
+          <li>Contact form live</li>
+          <li>About page populated</li>
+          <li>Awards &amp; Press section</li>
+          <li>SEO fixes (alt text, H1s)</li>
+        </ul>
+        <div style="margin-top:14px;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent-light);">Impact: immediate ↑ leads</div>
+      </div>
+      <div class="roadmap-phase p2">
+        <div class="rp-label">Phase 2</div>
+        <div class="rp-time">Months 2–4</div>
+        <ul class="rp-items">
+          <li>Services process page</li>
+          <li>Portfolio case studies</li>
+          <li>Testimonial programme</li>
+          <li>Blog + local SEO</li>
+          <li>Audience pathways</li>
+        </ul>
+        <div style="margin-top:14px;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold);">Impact: ↑ search rankings</div>
+      </div>
+      <div class="roadmap-phase p3">
+        <div class="rp-label">Phase 3</div>
+        <div class="rp-time">Months 4–8</div>
+        <ul class="rp-items">
+          <li>Wix → Webflow migration</li>
+          <li>New visual identity</li>
+          <li>Portfolio with filtering</li>
+          <li>Interactive before/after</li>
+          <li>Content marketing engine</li>
+        </ul>
+        <div style="margin-top:14px;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#6A9ABB;">Impact: matches the work</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 28 — Closing -->
+<div class="slide slide-close" data-chapter="Expected Impact">
+  <div style="width:100%;height:100%;display:flex;align-items:stretch;">
+
+    <!-- Left: personal note -->
+    <div style="flex:1;padding:64px 52px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid #3A2D24;">
+      <div style="font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--gold);margin-bottom:24px;">A Personal Note</div>
+      <p style="font-family:'Playfair Display',serif;font-size:21px;line-height:1.55;color:var(--cream);font-weight:400;font-style:italic;margin-bottom:24px;">"The conversation was natural, wide-ranging, and productive. Shared values around sustainability, quality of light, and functional design were apparent from the very first meeting."</p>
+      <div style="width:36px;height:1px;background:var(--accent);margin-bottom:20px;"></div>
+      <p style="font-size:13px;color:#B0A898;line-height:1.75;font-weight:300;">This proposal comes from someone who has sat across the table from Andrew and Cindy — and experienced firsthand the care, expertise, and genuine engagement that defines how this firm works with every client.</p>
+      <p style="font-size:13px;color:#B0A898;line-height:1.75;font-weight:300;margin-top:14px;">The 1920s Cape on Hanover Street in Newbury is in good hands. The website should say so to everyone else who is looking.</p>
+    </div>
+
+    <!-- Right: the vision -->
+    <div style="flex:1;padding:64px 52px;display:flex;flex-direction:column;justify-content:center;">
+      <div style="font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--accent-light);margin-bottom:24px;">The Vision</div>
+      <p style="font-family:'Playfair Display',serif;font-size:30px;line-height:1.35;color:var(--cream);font-weight:400;margin-bottom:28px;">Andrew Sidford Architects deserves to be <em style="color:var(--gold);">the</em> destination online for people who love well-designed architecture.</p>
+      <div style="width:36px;height:1px;background:var(--gold);margin-bottom:20px;"></div>
+      <p style="font-size:13px;color:#B0A898;line-height:1.8;font-weight:300;">Not just a portfolio — a place that radiates the same quality of attention to light, to sustainability, and to the way people actually live that defines every project this firm has built over 35 years.</p>
+      <p style="font-size:13px;color:#B0A898;line-height:1.8;font-weight:300;margin-top:14px;">The work is extraordinary. It is time the front door matched what is inside.</p>
+      <div style="margin-top:36px;display:flex;align-items:center;gap:16px;">
+        <div style="width:36px;height:1px;background:#3A3028;"></div>
+        <span style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#5A5048;">asidfordarchitects.com</span>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+
+<!-- SLIDE 29 — Call to Action -->
+<div class="slide" data-chapter="Expected Impact" style="background:#F7F2E8;">
+  <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:64px 80px;">
+    <div style="max-width:780px;width:100%;text-align:center;">
+
+      <div style="font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:#B8956A;margin-bottom:28px;font-weight:500;">Let's Talk</div>
+
+      <p style="font-family:'Playfair Display',serif;font-size:48px;line-height:1.2;color:#1C1C1A;font-weight:400;margin-bottom:12px;">Interested in following up<br>on this proposal?</p>
+
+      <p style="font-family:'Playfair Display',serif;font-size:48px;line-height:1.2;color:#B8956A;font-style:italic;font-weight:400;margin-bottom:40px;">We'd love to hear from you.</p>
+
+      <div style="width:48px;height:2px;background:#8B3A2A;margin:0 auto 40px;"></div>
+
+      <p style="font-size:15px;color:#6B6B68;line-height:1.7;font-weight:300;max-width:520px;margin:0 auto 44px;">Reach out directly to discuss next steps, timeline, or any questions about this website improvement roadmap for Andrew Sidford Architects.</p>
+
+      <a href="mailto:Ethan@tribalmischief.com"
+         style="display:inline-block;padding:18px 48px;background:#8B3A2A;color:#F7F2E8;text-decoration:none;font-size:13px;letter-spacing:0.18em;text-transform:uppercase;font-weight:500;font-family:'DM Sans',sans-serif;transition:background 0.2s;">
+        Ethan@tribalmischief.com
+      </a>
+
+      <div style="margin-top:56px;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#C8C0B0;">asidfordarchitects.com &nbsp;·&nbsp; Website Proposal 2026</div>
+
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const counter = document.getElementById('counter');
+  const progressFill = document.getElementById('progress-fill');
+  const chapterNav = document.getElementById('chapter-nav');
+
+  let current = 0;
+  const total = slides.length;
+
+  // Build chapter navigation
+  const chapters = [];
+  slides.forEach((slide, i) => {
+    const ch = slide.dataset.chapter;
+    if (!chapters.find(c => c.name === ch)) {
+      chapters.push({ name: ch, firstSlide: i });
+    }
+  });
+
+  chapters.forEach(ch => {
+    const btn = document.createElement('button');
+    btn.className = 'chapter-btn';
+    btn.textContent = ch.name;
+    btn.onclick = () => goTo(ch.firstSlide);
+    chapterNav.appendChild(btn);
+  });
+
+  function getCurrentChapter() {
+    const slide = slides[current];
+    return slide.dataset.chapter;
+  }
+
+  function updateNav() {
+    const currentCh = getCurrentChapter();
+    document.querySelectorAll('.chapter-btn').forEach((btn, i) => {
+      btn.classList.toggle('active', chapters[i].name === currentCh);
+    });
+  }
+
+  function goTo(n) {
+    slides[current].classList.remove('active');
+    current = Math.max(0, Math.min(n, total - 1));
+    slides[current].classList.add('active');
+    counter.textContent = `${current + 1} / ${total}`;
+    progressFill.style.width = `${((current + 1) / total) * 100}%`;
+    updateNav();
+  }
+
+  function nextSlide() { if (current < total - 1) goTo(current + 1); }
+  function prevSlide() { if (current > 0) goTo(current - 1); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') nextSlide();
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') prevSlide();
+  });
+
+  // Initialize
+  goTo(0);
+</script>
+</body>
+</html>
